@@ -91,7 +91,7 @@ def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
     assert user_list.status_code == 200
     assert len(user_list.json()) == 20
 
-    """Проверика авторизации для каждого нового пользователя. Необходимо используя анонимный клиент
+    """Проверка авторизации для каждого нового пользователя. Необходимо используя анонимный клиент
             отправить POST-запрос на url f'/api/v1/users/{created_users_id}/' response.status_code == 200"""
 
     for user in user_list.json():
