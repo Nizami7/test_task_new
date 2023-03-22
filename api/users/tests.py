@@ -65,4 +65,43 @@ def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
 
     """
 
-    ...
+    """Создание пользователя отправив POST-запрос на url '/api/v1/users/'
+        response.status_code == 200"""
+
+    users_count = 20
+    users_data = [
+        {
+            'username': f'user_{i}',
+            'password': f'password_{i}',
+            'email': f'email_{i}@mail.ru',
+        }
+        for i in range(users_count)
+    ]
+
+    path = '/api/v1/users/'
+    for user in users_data:
+        response = admin_client.post(path=path, data={'username': user['username'], 'password': user['password'],
+                                                      'email': user['email']})
+        assert response.status_code == 200
+
+    """Проверка количества созданных пользователей отправив GET-запрос на url '/api/v1/users/'
+            response.status_code == 200"""
+
+    user_list = admin_client.get(path)
+    assert user_list.status_code == 200
+    assert len(user_list.json()) == 20
+
+    """Проверика авторизации для каждого нового пользователя. Необходимо используя анонимный клиент
+            отправить POST-запрос на url f'/api/v1/users/{created_users_id}/' response.status_code == 200"""
+
+    for user in user_list.json():
+        response = anon_client.post(path=f'/api/v1/users/{user.id}/')
+        assert response.status_code == 200
+
+    """Удаление всех созданных пользователей, отправив DELETE-запрос на url f'/api/v1/users/{created_users_id}/',
+            response.status_code == 204"""
+
+    for user in user_list.json():
+        response = anon_client.delete(path=f'/api/v1/users/{user.id}/', )
+        assert response.status_code == 204
+
